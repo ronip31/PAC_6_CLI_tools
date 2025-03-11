@@ -1,4 +1,52 @@
 # PAC_6
+
+# Sistema Automatizado de Análise de Código
+
+Este projeto oferece uma ferramenta automatizada para análise de código-fonte, facilitando a contagem de linhas, identificação de funções e classes, além da contabilização de comentários. Desenvolvido especialmente para auxiliar desenvolvedores a melhorar a qualidade e a manutenção de projetos de software.
+
+## História do Usuário
+
+**Como desenvolvedor de sistemas**, desejo um sistema de análise automatizada de código que conte as linhas de código, identifique funções e classes, e contabilize comentários, a fim de melhorar a qualidade e manutenção dos projetos de software.
+
+##  Critérios de Aceitação
+
+### 1. Interface de Linha de Comando (CLI)
+- Comandos intuitivos definidos através de bibliotecas como Argparse, Click ou Typer.
+- Comando padrão para exibição das opções de ajuda (`--help`).
+- Validação clara e precisa dos argumentos e parâmetros fornecidos pelo usuário.
+- Menu de ajuda com informações claras sobre cada comando disponível.
+
+### 2. Contagem de Linhas de Código (LOC)
+- Contagem precisa das linhas de código em um arquivo fornecido pelo usuário.
+- Opção para incluir ou excluir linhas vazias na contagem.
+- Mensagens claras de erro em casos de arquivo inexistente ou corrompido.
+
+### 3. Identificação e Contagem de Funções e Classes
+- Identificação e contagem correta de funções (`def`) e classes (`class`) usando expressões regulares em Python.
+- Retorno separado da contagem de funções e classes.
+- Mensagens amigáveis para padrões inesperados ou arquivos ilegíveis.
+
+### 4. Contagem de Comentários
+- Detecção precisa de comentários em Python (`#`).
+- Uso de expressões regulares robustas para precisão.
+- Retorno claro do número específico de linhas comentadas.
+
+### 5. Geração Automática de Relatórios
+- Escolha de formato do relatório (CSV, JSON ou TXT) via argumento CLI.
+- Consolidação clara dos resultados das análises (LOC, funções/classes e comentários).
+- Relatório objetivo e fácil de interpretar.
+- Informações claras sobre erros durante a geração do relatório (permissões, diretórios inválidos, espaço em disco insuficiente).
+
+### 6. Documentação
+- README claro com explicação dos comandos disponíveis, uso e exemplos práticos.
+- Explicação detalhada da estrutura interna do projeto e principais métodos.
+- Processo detalhado para execução dos testes e interpretação dos resultados.
+
+
+
+---
+
+
  
  # Contador de Linhas de Código (LOC)
 
@@ -57,11 +105,8 @@ O script exibirá a contagem de linhas de código, comentários, docstrings, fun
 - **Erro: `Permission denied` ao executar o script**
   - Verifique as permissões do arquivo e tente rodar o comando com `python3` ou `sudo python3` se necessário.
 
-## Contribuições
-
-Sinta-se à vontade para melhorar este script e compartilhar sugestões! Abra um pull request ou envie um issue no repositório onde ele estiver hospedado.
 
 ---
 
-Autor: [Seu Nome]
+
 
