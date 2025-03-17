@@ -1,18 +1,17 @@
-# PAC_6
+PAC_6
+
 
 # Sistema Automatizado de Análise de Código
 
 Este projeto oferece uma ferramenta automatizada para análise de código-fonte, facilitando a contagem de linhas, identificação de funções e classes, além da contabilização de comentários. Desenvolvido especialmente para auxiliar desenvolvedores a melhorar a qualidade e a manutenção de projetos de software.
 
 ## História do Usuário
+Como desenvolvedor de sistemas, desejo um sistema de análise automatizada de código que conte as linhas de código, identifique funções e classes, e contabilize comentários, a fim de melhorar a qualidade e manutenção dos projetos de software.
 
-**Como desenvolvedor de sistemas**, desejo um sistema de análise automatizada de código que conte as linhas de código, identifique funções e classes, e contabilize comentários, a fim de melhorar a qualidade e manutenção dos projetos de software.
-
-##  Critérios de Aceitação
-
+## Critérios de Aceitação
 ### 1. Interface de Linha de Comando (CLI)
 - Comandos intuitivos definidos através de bibliotecas como Argparse, Click ou Typer.
-- Comando padrão para exibição das opções de ajuda (`--help`).
+- Comando padrão para exibição das opções de ajuda (--help).
 - Validação clara e precisa dos argumentos e parâmetros fornecidos pelo usuário.
 - Menu de ajuda com informações claras sobre cada comando disponível.
 
@@ -42,71 +41,124 @@ Este projeto oferece uma ferramenta automatizada para análise de código-fonte,
 - Explicação detalhada da estrutura interna do projeto e principais métodos.
 - Processo detalhado para execução dos testes e interpretação dos resultados.
 
-
-
----
-
-
- 
- # Contador de Linhas de Código (LOC)
-
+## Contador de Linhas de Código (LOC)
 Este script em Python analisa um arquivo Python específico e exibe informações sobre o número de linhas de código, comentários, docstrings, funções e classes.
 
 ## Requisitos
-
 Antes de executar o script, você precisa ter o Python instalado em seu sistema. Você pode verificar se o Python está instalado rodando o seguinte comando no terminal:
-
-```sh
+```bash
 python --version
 ```
+Se o Python não estiver instalado, faça o download e instale a partir do site oficial: [Python Downloads](https://www.python.org/downloads/)
 
-Se o Python não estiver instalado, faça o download e instale a partir do site oficial: [https://www.python.org/downloads/](https://www.python.org/downloads/)
-
-## Instalação da Biblioteca `typer`
-
+## Instalação da Biblioteca Typer
 Este script usa a biblioteca `typer` para criar a interface de linha de comando. Para instalá-la, use o seguinte comando:
-
-```sh
+```bash
 pip install typer
 ```
-
 Se desejar suporte a cores para melhor visualização no terminal, também instale `rich`:
-
-```sh
+```bash
 pip install rich
 ```
 
-## Como Executar o Script
+# Code Analyzer CLI
 
-1. Salve o código em um arquivo Python, por exemplo: `contador_loc.py`.
-2. No terminal, navegue até o diretório onde o arquivo está salvo.
-3. Execute o seguinte comando:
+## Sobre o Projeto
+O **Code Analyzer CLI** é uma ferramenta de linha de comando desenvolvida em Python para análise de código-fonte Python. A ferramenta permite realizar diversas análises, incluindo:
 
-```sh
-python contador_loc.py loc <caminho_do_arquivo_python>
+- Contagem de linhas de código
+- Contagem de comentários
+- Contagem de docstrings
+- Contagem de classes
+- Contagem de funções
+
+## Instalação
+
+### 1. Clone o Repositório
+```bash
+git clone https://github.com/seu-usuario/PAC_6_CLI_tools.git
+cd code-analyzer
+```
+
+### 2. Instale as Dependências
+```bash
+pip install -r requirements.txt
+```
+
+## Uso
+Para visualizar a ajuda geral da ferramenta:
+```bash
+python -m analyzer.main --help
+```
+
+### Comandos Disponíveis
+| Comando             | Descrição                                         |
+|---------------------|-------------------------------------------------|
+| `analyze-all`      | Analisa todas as métricas do código              |
+| `analyze-lines`    | Conta o número total de linhas no código         |
+| `analyze-comments` | Conta o número de comentários no código          |
+| `analyze-docstrings` | Conta o número de docstrings no código       |
+| `analyze-classes`  | Conta o número de classes no código              |
+| `analyze-functions`| Conta o número de funções no código              |
+
+### Exemplo de Uso
+Para analisar um arquivo `sample.py` e obter todas as métricas:
+```bash
+python -m analyzer.main analyze-all examples/sample.py
+```
+#### Saída esperada:
+```bash
+Arquivo: examples/sample.py
+Total de linhas: 13
+Comentários: 2
+Docstrings: 3
+Classes: 1
+Funções: 1
+```
+
+Para analisar apenas os comentários:
+```bash
+python -m analyzer.main analyze-comments examples/sample.py
+```
+
+### Analisando um Diretório Completo
+Se você deseja analisar todos os arquivos `.py` em um diretório, pode usar um loop no terminal:
+
+#### Windows (PowerShell):
+```powershell
+Get-ChildItem -Path examples -Filter "*.py" | ForEach-Object { python -m analyzer.main analyze-all $_.FullName }
+```
+
+#### Linux/macOS (Bash):
+```bash
+for file in examples/*.py; do python -m analyzer.main analyze-all "$file"; done
+```
+
+Isso executará a análise para todos os arquivos `.py` dentro do diretório `examples/`.
+
+## Testes
+Para rodar todos os testes unitários:
+```bash
+pytest tests/
+```
+Para rodar `pytest` diretamente via Python:
+```bash
+python -m pytest tests/
 ```
 
 ### Exemplo de Uso
-
-Se você deseja analisar um arquivo chamado `exemplo.py` localizado no mesmo diretório do script, execute:
-
-```sh
-python contador_loc.py loc exemplo.py
+Para rodar um teste específico, por exemplo `test_lines.py`:
+```bash
+pytest tests/test_lines.py
+```
+Para rodar os testes com saída detalhada:
+```bash
+pytest -v tests/
+```
+Para rodar apenas os testes que falharam anteriormente:
+```bash
+pytest --lf
 ```
 
-O script exibirá a contagem de linhas de código, comentários, docstrings, funções e classes.
-
-## Possíveis Erros e Soluções
-
-- **Erro: `Arquivo '<caminho>' não encontrado.`**
-  - Certifique-se de que o caminho do arquivo passado está correto.
-- **Erro: `ModuleNotFoundError: No module named 'typer'`**
-  - Certifique-se de que a biblioteca `typer` está instalada executando `pip install typer`.
-- **Erro: `Permission denied` ao executar o script**
-  - Verifique as permissões do arquivo e tente rodar o comando com `python3` ou `sudo python3` se necessário.
-
-
----
-
-
-
+## Licença
+Este projeto é open-source e está sob a licença MIT.
