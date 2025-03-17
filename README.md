@@ -41,6 +41,9 @@ Como desenvolvedor de sistemas, desejo um sistema de análise automatizada de c�
 - Explicação detalhada da estrutura interna do projeto e principais métodos.
 - Processo detalhado para execução dos testes e interpretação dos resultados.
 
+## Contador de Linhas de Código (LOC)
+Este script em Python analisa um arquivo Python específico e exibe informações sobre o número de linhas de código, comentários, docstrings, funções e classes.
+
 ## Requisitos
 Antes de executar o script, você precisa ter o Python instalado em seu sistema. Você pode verificar se o Python está instalado rodando o seguinte comando no terminal:
 ```bash
@@ -59,6 +62,15 @@ pip install rich
 ```
 
 # Code Analyzer CLI
+
+## Sobre o Projeto
+O **Code Analyzer CLI** é uma ferramenta de linha de comando desenvolvida em Python para análise de código-fonte Python. A ferramenta permite realizar diversas análises, incluindo:
+
+- Contagem de linhas de código
+- Contagem de comentários
+- Contagem de docstrings
+- Contagem de classes
+- Contagem de funções
 
 ## Instalação
 
@@ -89,6 +101,41 @@ python -m analyzer.main --help
 | `analyze-classes`  | Conta o número de classes no código              |
 | `analyze-functions`| Conta o número de funções no código              |
 
+### Exemplo de Uso
+Para analisar um arquivo `sample.py` e obter todas as métricas:
+```bash
+python -m analyzer.main analyze-all examples/sample.py
+```
+#### Saída esperada:
+```bash
+Arquivo: examples/sample.py
+Total de linhas: 13
+Comentários: 2
+Docstrings: 3
+Classes: 1
+Funções: 1
+```
+
+Para analisar apenas os comentários:
+```bash
+python -m analyzer.main analyze-comments examples/sample.py
+```
+
+### Analisando um Diretório Completo
+Se você deseja analisar todos os arquivos `.py` em um diretório, pode usar um loop no terminal:
+
+#### Windows (PowerShell):
+```powershell
+Get-ChildItem -Path examples -Filter "*.py" | ForEach-Object { python -m analyzer.main analyze-all $_.FullName }
+```
+
+#### Linux/macOS (Bash):
+```bash
+for file in examples/*.py; do python -m analyzer.main analyze-all "$file"; done
+```
+
+Isso executará a análise para todos os arquivos `.py` dentro do diretório `examples/`.
+
 ## Testes
 Para rodar todos os testes unitários:
 ```bash
@@ -115,4 +162,3 @@ pytest --lf
 
 ## Licença
 Este projeto é open-source e está sob a licença MIT.
-
