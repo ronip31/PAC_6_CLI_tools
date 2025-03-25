@@ -6,7 +6,7 @@ def count_classes(code: str) -> int:
     tree = ast.parse(code)
     return sum(1 for node in ast.walk(tree) if isinstance(node, ast.ClassDef))
 
-def analyze_classes_command(file: str):
+def analyze_classes(file: str):
     """Comando CLI para contar classes."""
     with open(file, "r", encoding="utf-8") as f:
         code = f.read()

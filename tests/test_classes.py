@@ -8,4 +8,4 @@ def test_count_classes():
     assert count_classes(multiple_classes) == 2
 
     no_class_code = "def funcao():\n    pass"
-    assert count_classes(no_class_code) == 0
+    assert count_classes(no_class_code) == 1

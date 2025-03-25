@@ -1,9 +1,9 @@
 import typer
-from analyzer.analyze_lines import analyze_lines_command, count_lines
-from analyzer.analyze_comments import analyze_comments_command, count_comments
-from analyzer.analyze_docstrings import analyze_docstrings_command, count_docstrings
-from analyzer.analyze_classes import analyze_classes_command, count_classes
-from analyzer.analyze_functions import analyze_functions_command, count_functions
+from analyzer.analyze_lines import analyze_lines, count_lines
+from analyzer.analyze_comments import analyze_comments, count_comments
+from analyzer.analyze_docstrings import analyze_docstrings, count_docstrings
+from analyzer.analyze_classes import analyze_classes, count_classes
+from analyzer.analyze_functions import analyze_functions, count_functions
 
 app = typer.Typer(help="""
 Ferramenta CLI para análise de código Python.
@@ -38,11 +38,11 @@ def analyze_all(file: str):
     typer.echo(f"Funções: {function_count}")
 
 # Registrando os comandos individuais corretamente
-app.command(help="Conta o número total de linhas no código.")(analyze_lines_command)
-app.command(help="Conta o número de comentários no código.")(analyze_comments_command)
-app.command(help="Conta a quantidade de docstrings no código.")(analyze_docstrings_command)
-app.command(help="Conta o número de classes no código.")(analyze_classes_command)
-app.command(help="Conta o número de funções no código.")(analyze_functions_command)
+app.command(help="Conta o número total de linhas no código.")(analyze_lines)
+app.command(help="Conta o número de comentários no código.")(analyze_comments)
+app.command(help="Conta a quantidade de docstrings no código.")(analyze_docstrings)
+app.command(help="Conta o número de classes no código.")(analyze_classes)
+app.command(help="Conta o número de funções no código.")(analyze_functions)
 
 if __name__ == "__main__":
     app()

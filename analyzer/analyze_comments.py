@@ -13,7 +13,7 @@ def count_comments(code: str) -> int:
                 continue  # Se só tinha um comentário, não conta como código
     return comment_lines
 
-def analyze_comments_command(file: str):
+def analyze_comments(file: str):
     """Comando CLI para contar comentários."""
     with open(file, "r", encoding="utf-8") as f:
         code = f.read()

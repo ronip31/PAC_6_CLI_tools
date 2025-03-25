@@ -6,7 +6,7 @@ def count_functions(code: str) -> int:
     tree = ast.parse(code)
     return sum(1 for node in ast.walk(tree) if isinstance(node, ast.FunctionDef))
 
-def analyze_functions_command(file: str):
+def analyze_functions(file: str):
     """Comando CLI para contar funções."""
     with open(file, "r", encoding="utf-8") as f:
         code = f.read()

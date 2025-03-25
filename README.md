@@ -137,11 +137,8 @@ for file in examples/*.py; do python -m analyzer.main analyze-all "$file"; done
 Isso executará a análise para todos os arquivos `.py` dentro do diretório `examples/`.
 
 ## Testes
+
 Para rodar todos os testes unitários:
-```bash
-pytest tests/
-```
-Para rodar `pytest` diretamente via Python:
 ```bash
 python -m pytest tests/
 ```
@@ -149,15 +146,15 @@ python -m pytest tests/
 ### Exemplo de Uso
 Para rodar um teste específico, por exemplo `test_lines.py`:
 ```bash
-pytest tests/test_lines.py
+python -m pytest tests/test_lines.py
 ```
 Para rodar os testes com saída detalhada:
 ```bash
-pytest -v tests/
+python -m pytest -v tests/
 ```
 Para rodar apenas os testes que falharam anteriormente:
 ```bash
-pytest --lf
+python -m pytest --lf 
 ```
 
 ## Licença
