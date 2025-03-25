@@ -1,0 +1,25 @@
+[project]
+name = "analyzer"
+version = "1.0.0"
+description = "Ferramenta CLI para análise de código Python"
+authors = [{name = "Catolica SC - 6ª fase - Engenharia de Software"}]
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "typer[all]",
+    "rich",
+    "pytest"
+]
+
+[project.scripts]
+analyzer = "analyzer.main:cli_main"
+runtests = "scripts.run_tests:run"
+runtests-verbose = "scripts.run_tests:run_verbose"
+runtests-failures = "scripts.run_tests:run_failures"
+
+[tool.setuptools]
+packages = ["analyzer", "scripts"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
