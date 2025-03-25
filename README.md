@@ -79,13 +79,44 @@ git clone https://github.com/seu-usuario/PAC_6_CLI_tools.git
 cd PAC_6_CLI_tools
 ```
 
-### 2. Instale em modo desenvolvimento
+#### 2. Crie e ative o ambiente virtual
 
-Esse modo permite que qualquer alteração no código seja refletida automaticamente.
+##### Windows PowerShell:
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+##### Linux/macOS:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+#### 3. Instale em modo desenvolvimento
 
 ```bash
 pip install -e .
 ```
+
+> ⚠️ **Importante:** certifique-se de ativar o ambiente virtual antes de rodar o comando acima, para que o comando `analyzer` fique disponível corretamente no terminal.
+
+---
+
+### ✅ Verificando o comando
+
+Após instalar, você pode verificar se o comando foi instalado corretamente com:
+
+```bash
+analyzer -v
+```
+ou
+
+```bash
+analyzer --version
+```
+
 
 ---
 
