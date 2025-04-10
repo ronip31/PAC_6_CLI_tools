@@ -1,5 +1,10 @@
 # PAC_6
 
+Alunos: 
+        Alberto Zilio
+        Lucas Steffens
+        Roni Pereira
+
 # Sistema Automatizado de Análise de Código
 
 Este projeto oferece uma ferramenta automatizada para análise de código-fonte, facilitando a contagem de linhas, identificação de funções e classes, além da contabilização de comentários. Desenvolvido especialmente para auxiliar desenvolvedores a melhorar a qualidade e a manutenção de projetos de software.
@@ -134,6 +139,7 @@ Depois da instalação, você poderá usar o comando `analyzer` diretamente no t
 | `docstrings`         | Conta o número de docstrings no código                  |
 | `classes`            | Conta o número de classes no código                     |
 | `functions`          | Conta o número de funções no código                     |
+| `indent`             | Analisa os níveis de indentação e mostra média, mínima, máxima e histograma |
 | `--version` / `-v`   | Exibe a versão da ferramenta                            |
 | `--help`             | Exibe o menu de ajuda personalizado                     |
 

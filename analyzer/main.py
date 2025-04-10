@@ -4,6 +4,9 @@ from analyzer.analyze_comments import analyze_comments, count_comments
 from analyzer.analyze_docstrings import analyze_docstrings, count_docstrings
 from analyzer.analyze_classes import analyze_classes, count_classes
 from analyzer.analyze_functions import analyze_functions, count_functions
+from analyzer.analyze_indentation import analyze_indentation, count_indentation
+
+
 
 from rich.console import Console
 from rich.panel import Panel
@@ -43,6 +46,7 @@ Ferramenta CLI para análise de código Python.
 - `docstrings`        → Conta as docstrings
 - `classes`           → Conta as classes
 - `functions`         → Conta as funções
+- `indent`            → Analisa os níveis de indentação
 
 ## 🧪 Comandos auxiliares (via terminal)
 - `runtests`              → Roda todos os testes
@@ -80,6 +84,7 @@ def analyze_all(file: str = typer.Argument(..., help="Caminho para o arquivo Pyt
     docstring_count = count_docstrings(code)
     class_count = count_classes(code)
     function_count = count_functions(code)
+    indent_result = count_indentation(file)
 
     # Exibição formatada
     table = Table(title=f"📊 Análise do Arquivo: {file}", title_style="bold cyan")
@@ -91,6 +96,9 @@ def analyze_all(file: str = typer.Argument(..., help="Caminho para o arquivo Pyt
     table.add_row("Docstrings", str(docstring_count))
     table.add_row("Classes", str(class_count))
     table.add_row("Funções", str(function_count))
+    table.add_row("Indentação Média", str(indent_result["average_indent"]))
+    table.add_row("Indentação Máxima", str(indent_result["max_indent"]))
+    table.add_row("Indentação Mínima", str(indent_result["min_indent"]))
 
     console.print(table)
 
@@ -110,11 +118,16 @@ def docstrings(file: str = typer.Argument(..., help="Caminho para o arquivo Pyth
 @app.command("classes", help="Conta o número de classes no código.")
 def classes(file: str = typer.Argument(..., help="Caminho para o arquivo Python.")):
     analyze_classes(file)
-
 @app.command("functions", help="Conta o número de funções no código.")
 def functions(file: str = typer.Argument(..., help="Caminho para o arquivo Python.")):
     analyze_functions(file)
 
+
+@app.command("indent", help="Analisa os níveis de indentação do código.")
+def indent(file: str = typer.Argument(..., help="Caminho para o arquivo Python.")):
+    analyze_indentation(file)
+
+    
 # Entrada CLI
 def cli_main():
     app()
