@@ -7,8 +7,13 @@ from analyzer.analyze_classes import analyze_classes, count_classes
 from analyzer.analyze_functions import analyze_functions, count_functions
 from analyzer.analyze_indentation import analyze_indentation, count_indentation
 from analyzer.dependency_analyzer import get_external_imports, analyze_repository
+
 from analyzer.analyze_comment_ratio import ProporcaoComentarioCodigo
 from analyzer.analyze_methods import analyze_methods, count_methods
+
+from pathlib import Path
+import subprocess
+
 
 from rich.console import Console
 from rich.panel import Panel
@@ -42,22 +47,36 @@ def main(
 Ferramenta CLI para análise de código Python.
 
 ## 📦 Comandos principais
+- `all-dir`           → Executa 'analyzer all' para todos os arquivos .py no diretório informado.
 - `all`               → Analisa todas as métricas de uma vez
 - `lines`             → Conta o total de linhas de código
 - `comments`          → Conta o total de comentários
 - `docstrings`        → Conta as docstrings
 - `classes`           → Conta as classes
 - `functions`         → Conta as funções
+- `methods`           → Analisa os métodos públicos e privados no código
 - `indent`            → Analisa os níveis de indentação
+- `dependencies`      → Analisa as dependências externas do código
+
+
+## 💡 Exemplo
+```bash
+analyzer all examples/sample.py
+
+analyzer all-dir examples/
+```
 
 ## 🧪 Comandos auxiliares (via terminal)
 - `runtests`              → Roda todos os testes
 - `runtests-verbose`      → Roda testes com saída detalhada
 - `runtests-failures`     → Roda somente os testes que falharam anteriormente
 
+
 ## 💡 Exemplo
 ```bash
-analyzer all examples/sample.py
+runtests
+```
+
     """
         console.print(Markdown(help_text))
         raise typer.Exit()
@@ -66,6 +85,27 @@ analyzer all examples/sample.py
         typer.secho("⚠️ Nenhum comando fornecido. Use '--help' para ver os comandos disponíveis.", fg=typer.colors.YELLOW)
         raise typer.Exit(code=1)
 
+
+@app.command("all-dir", help="Executa 'analyzer all' para todos os arquivos .py no diretório informado.")
+def analyze_directory(
+    path: str = typer.Argument(..., help="Diretório que contém arquivos .py para análise.")
+):
+    """
+    Executa 'analyzer all' para todos os arquivos .py no diretório informado.
+    """
+    p = Path(path)
+    if not p.exists() or not p.is_dir():
+        typer.secho(f"Diretório '{path}' não encontrado.", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    py_files = list(p.glob("*.py"))
+    if not py_files:
+        typer.secho(f"Nenhum arquivo .py encontrado no diretório: {path}", fg=typer.colors.YELLOW)
+        raise typer.Exit()
+
+    for py_file in py_files:
+        typer.echo(f"\n🔍 Analisando {py_file}...")
+        subprocess.run(["analyzer", "all", str(py_file)])
 
 
 

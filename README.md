@@ -91,7 +91,8 @@ cd PAC_6_CLI_tools
 
 ```powershell
 python -m venv venv
-.\venv\Scripts\Activate.ps1
+
+.\venv\Scripts\activate
 ```
 ##### Linux/macOS:
 
@@ -132,8 +133,9 @@ Depois da instalação, você poderá usar o comando `analyzer` diretamente no t
 
 ### Comandos Disponíveis
 
-| Comando               | Descrição                                               |
-|-----------------------|---------------------------------------------------------|
+| Comando              | Descrição                                               |
+|----------------------|---------------------------------------------------------|
+| `all-dir`            | Executa 'analyzer all' para todos os arquivos .py no diretório informado.|
 | `all`                | Analisa todas as métricas do código                     |
 | `lines`              | Conta o número total de linhas no código                |
 | `comments`           | Conta o número de comentários no código                 |
@@ -142,10 +144,19 @@ Depois da instalação, você poderá usar o comando `analyzer` diretamente no t
 | `functions`          | Conta o número de funções no código                     |
 | `methods`            | Analisa os métodos públicos e privados no código        |
 | `indent`             | Analisa os níveis de indentação e mostra média, mínima, máxima e histograma |
+| `dependencies`       | Analisa as dependências externas do código.             |
 | `--version` / `-v`   | Exibe a versão da ferramenta                            |
 | `--help`             | Exibe o menu de ajuda personalizado                     |
 
 ---
+
+### Exemplos de Uso
+
+#### Analisar todas as métricas de um arquivo:
+
+```bash
+analyzer all examples/sample.py
+```
 
 ## Comandos Auxiliares de Testes
 
@@ -161,10 +172,10 @@ Esses comandos são executados diretamente no terminal após a instalação do p
 
 ### Exemplos de Uso
 
-#### Analisar todas as métricas de um arquivo:
+#### Executa todos os testes com saída detalhada:
 
 ```bash
-analyzer all examples/sample.py
+runtests-verbose
 ```
 
 #### Analisar somente comentários:
