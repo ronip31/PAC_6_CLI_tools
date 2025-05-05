@@ -1,2 +1,3 @@
 typer[all]  # Para criar a CLI
 pytest  # Para rodar os testes unitários automatizados
+os

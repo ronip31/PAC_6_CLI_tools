@@ -1,3 +1,12 @@
+import os
+import typer
+
+app = typer.Typer(
+    help="Ferramenta CLI para análise de código Python.",
+    add_completion=False,
+    invoke_without_command=True
+)
+
 """Este é um exemplo de docstring no início do arquivo"""
 
 # Este é um comentário

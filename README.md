@@ -80,7 +80,7 @@ Instale a versão mais recente a partir de: [https://www.python.org/downloads/](
 ### 1. Clone o Repositório
 
 ```bash
-git clone https://github.com/seu-usuario/PAC_6_CLI_tools.git
+git clone https://github.com/ronip31/PAC_6_CLI_tools
 cd PAC_6_CLI_tools
 ```
 
