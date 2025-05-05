@@ -7,6 +7,9 @@ from analyzer.analyze_classes import analyze_classes, count_classes
 from analyzer.analyze_functions import analyze_functions, count_functions
 from analyzer.analyze_indentation import analyze_indentation, count_indentation
 from analyzer.dependency_analyzer import get_external_imports, analyze_repository
+from analyzer.analyze_comment_ratio import ProporcaoComentarioCodigo
+
+
 
 
 
@@ -92,6 +95,17 @@ def analyze_all(file: str = typer.Argument(..., help="Caminho para o arquivo Pyt
     import_counter = defaultdict(int)
     get_external_imports(file, import_counter)
 
+    # Proporção comentário/código
+    proporcao = ProporcaoComentarioCodigo(file)
+    resultado_unidades = proporcao.analisar()
+    if resultado_unidades:
+        percentual_medio = round(
+            sum(unidade["percentual"] for unidade in resultado_unidades) / len(resultado_unidades),
+            2
+        )
+    else:
+        percentual_medio = 0.0
+
     # Exibição final
     table = Table(title=f"📊 Análise do Arquivo: {file}", title_style="bold cyan")
     table.add_column("Métrica", style="bold yellow")
@@ -106,6 +120,7 @@ def analyze_all(file: str = typer.Argument(..., help="Caminho para o arquivo Pyt
     table.add_row("Indentação Máxima", str(indent_result["max_indent"]))
     table.add_row("Indentação Mínima", str(indent_result["min_indent"]))
     table.add_row("Dependências Externas", str(len(import_counter)))
+    table.add_row("Comentado (%) Médio por Unidade", f"{percentual_medio}%")
 
     console.print(table)
 
@@ -119,6 +134,7 @@ def analyze_all(file: str = typer.Argument(..., help="Caminho para o arquivo Pyt
         console.print(dep_table)
     else:
         console.print("[green]Nenhuma dependência externa encontrada.[/]")
+
 
 # Comandos individuais
 @app.command("lines", help="Conta o número total de linhas no código.")
@@ -168,6 +184,31 @@ def dependencies(path: str = typer.Argument(..., help="Caminho para o arquivo ou
         table.add_row(lib, str(count))
 
     console.print(table)
+
+@app.command("comment-ratio", help="Calcula o percentual de comentários por unidade de código (funções e classes).")
+def comment_ratio(file: str = typer.Argument(..., help="Caminho para o arquivo Python.")):
+    try:
+        analisador = ProporcaoComentarioCodigo(file)
+        resultados = analisador.analisar()
+    except FileNotFoundError as e:
+        typer.secho(str(e), fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    if not resultados:
+        console.print("[yellow]⚠️ Nenhuma função ou classe encontrada.[/]")
+        return
+
+    table = Table(title="📈 Proporção Comentário/Código", title_style="bold blue")
+    table.add_column("Unidade", style="bold yellow")
+    table.add_column("Linhas", justify="right")
+    table.add_column("Comentários", justify="right")
+    table.add_column("Comentado (%)", justify="right")
+
+    for r in resultados:
+        table.add_row(r["nome"], str(r["linhas_totais"]), str(r["comentarios"]), f'{r["percentual"]}%')
+
+    console.print(table)
+
 
 
     
