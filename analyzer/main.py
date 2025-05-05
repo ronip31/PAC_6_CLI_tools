@@ -8,11 +8,7 @@ from analyzer.analyze_functions import analyze_functions, count_functions
 from analyzer.analyze_indentation import analyze_indentation, count_indentation
 from analyzer.dependency_analyzer import get_external_imports, analyze_repository
 from analyzer.analyze_comment_ratio import ProporcaoComentarioCodigo
-
-
-
-
-
+from analyzer.analyze_methods import analyze_methods, count_methods
 
 from rich.console import Console
 from rich.panel import Panel
@@ -73,7 +69,7 @@ analyzer all examples/sample.py
 
 
 
-@app.command("all", help="Analisa todas as métricas do código (linhas, comentários, docstrings, classes, funções e dependências externas).")
+@app.command("all", help="Analisa todas as métricas do código (linhas, comentários, docstrings, classes, funções, métodos e dependências externas).")
 def analyze_all(file: str = typer.Argument(..., help="Caminho para o arquivo Python a ser analisado.")):
     try:
         with open(file, "r", encoding="utf-8") as f:
@@ -89,6 +85,8 @@ def analyze_all(file: str = typer.Argument(..., help="Caminho para o arquivo Pyt
     class_count = count_classes(code)
     function_count = count_functions(code)
     indent_result = count_indentation(file)
+    public_methods, private_methods = count_methods(code)
+    total_methods = public_methods + private_methods
 
     # Dependências externas com contagem
     from collections import defaultdict
@@ -116,6 +114,13 @@ def analyze_all(file: str = typer.Argument(..., help="Caminho para o arquivo Pyt
     table.add_row("Docstrings", str(docstring_count))
     table.add_row("Classes", str(class_count))
     table.add_row("Funções", str(function_count))
+    table.add_row("Métodos Públicos", str(public_methods))
+    table.add_row("Métodos Privados", str(private_methods))
+    table.add_row("Total de Métodos", str(total_methods))
+    if total_methods > 0:
+        public_ratio = (public_methods / total_methods) * 100
+        private_ratio = (private_methods / total_methods) * 100
+        table.add_row("Proporção Público/Privado", f"{public_ratio:.1f}% / {private_ratio:.1f}%")
     table.add_row("Indentação Média", str(indent_result["average_indent"]))
     table.add_row("Indentação Máxima", str(indent_result["max_indent"]))
     table.add_row("Indentação Mínima", str(indent_result["min_indent"]))
@@ -208,6 +213,10 @@ def comment_ratio(file: str = typer.Argument(..., help="Caminho para o arquivo P
         table.add_row(r["nome"], str(r["linhas_totais"]), str(r["comentarios"]), f'{r["percentual"]}%')
 
     console.print(table)
+
+@app.command("methods", help="Analisa os métodos públicos e privados no código.")
+def methods(file: str = typer.Argument(..., help="Caminho para o arquivo Python.")):
+    analyze_methods(file)
 
 
 

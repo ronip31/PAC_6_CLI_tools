@@ -7,11 +7,11 @@ Alunos:
 
 # Sistema Automatizado de Análise de Código
 
-Este projeto oferece uma ferramenta automatizada para análise de código-fonte, facilitando a contagem de linhas, identificação de funções e classes, além da contabilização de comentários. Desenvolvido especialmente para auxiliar desenvolvedores a melhorar a qualidade e a manutenção de projetos de software.
+Este projeto oferece uma ferramenta automatizada para análise de código-fonte, facilitando a contagem de linhas, identificação de funções, classes e métodos, além da contabilização de comentários. Desenvolvido especialmente para auxiliar desenvolvedores a melhorar a qualidade e a manutenção de projetos de software.
 
 ## História do Usuário
 
-Como desenvolvedor de sistemas, desejo um sistema de análise automatizada de código que conte as linhas de código, identifique funções e classes, e contabilize comentários, a fim de melhorar a qualidade e manutenção dos projetos de software.
+Como desenvolvedor de sistemas, desejo um sistema de análise automatizada de código que conte as linhas de código, identifique funções, classes e métodos (públicos/privados), e contabilize comentários, a fim de melhorar a qualidade e manutenção dos projetos de software.
 
 ## Critérios de Aceitação
 
@@ -26,9 +26,9 @@ Como desenvolvedor de sistemas, desejo um sistema de análise automatizada de c�
 - Opção para incluir ou excluir linhas vazias na contagem.
 - Mensagens claras de erro em casos de arquivo inexistente ou corrompido.
 
-### 3. Identificação e Contagem de Funções e Classes
-- Identificação e contagem correta de funções (`def`) e classes (`class`) usando expressões regulares em Python.
-- Retorno separado da contagem de funções e classes.
+### 3. Identificação e Contagem de Funções, Classes e Métodos
+- Identificação e contagem correta de funções (`def`), classes (`class`) e métodos usando expressões regulares em Python.
+- Retorno separado da contagem de funções, classes e métodos (públicos/privados).
 - Mensagens amigáveis para padrões inesperados ou arquivos ilegíveis.
 
 ### 4. Contagem de Comentários
@@ -38,7 +38,7 @@ Como desenvolvedor de sistemas, desejo um sistema de análise automatizada de c�
 
 ### 5. Geração Automática de Relatórios
 - Escolha de formato do relatório (CSV, JSON ou TXT) via argumento CLI.
-- Consolidação clara dos resultados das análises (LOC, funções/classes e comentários).
+- Consolidação clara dos resultados das análises (LOC, funções/classes/métodos e comentários).
 - Relatório objetivo e fácil de interpretar.
 - Informações claras sobre erros durante a geração do relatório (permissões, diretórios inválidos, espaço em disco insuficiente).
 
@@ -60,6 +60,7 @@ O **Code Analyzer CLI** é uma ferramenta de linha de comando desenvolvida em Py
 - Contagem de docstrings
 - Contagem de classes
 - Contagem de funções
+- Análise de métodos (públicos/privados)
 
 ---
 
@@ -139,6 +140,7 @@ Depois da instalação, você poderá usar o comando `analyzer` diretamente no t
 | `docstrings`         | Conta o número de docstrings no código                  |
 | `classes`            | Conta o número de classes no código                     |
 | `functions`          | Conta o número de funções no código                     |
+| `methods`            | Analisa os métodos públicos e privados no código        |
 | `indent`             | Analisa os níveis de indentação e mostra média, mínima, máxima e histograma |
 | `--version` / `-v`   | Exibe a versão da ferramenta                            |
 | `--help`             | Exibe o menu de ajuda personalizado                     |
@@ -169,6 +171,12 @@ analyzer all examples/sample.py
 
 ```bash
 analyzer comments examples/sample.py
+```
+
+#### Analisar métodos públicos e privados:
+
+```bash
+analyzer methods examples/sample.py
 ```
 
 #### Exibir versão da ferramenta:
