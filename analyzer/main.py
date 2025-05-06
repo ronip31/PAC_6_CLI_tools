@@ -20,6 +20,10 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.markdown import Markdown
 
+from analyzer.output_formatter import format_output
+import json
+from datetime import datetime
+
 app = typer.Typer(
     help="Ferramenta CLI para análise de código Python.",
     add_completion=False,
@@ -47,36 +51,46 @@ def main(
 Ferramenta CLI para análise de código Python.
 
 ## 📦 Comandos principais
-- `all-dir`           → Executa 'analyzer all' para todos os arquivos .py no diretório informado.
-- `all`               → Analisa todas as métricas de uma vez
-- `lines`             → Conta o total de linhas de código
-- `comments`          → Conta o total de comentários
-- `docstrings`        → Conta as docstrings
-- `classes`           → Conta as classes
-- `functions`         → Conta as funções
-- `methods`           → Analisa os métodos públicos e privados no código
-- `indent`            → Analisa os níveis de indentação
-- `dependencies`      → Analisa as dependências externas do código
+- `all`                → Analisa todas as métricas de um arquivo
+- `all-dir`            → Analisa todas as métricas de arquivos Python em um diretório
+- `lines`              → Conta o número total de linhas no código
+- `comments`           → Conta o número de comentários no código
+- `docstrings`         → Conta o número de docstrings no código
+- `classes`            → Conta o número de classes no código
+- `functions`          → Conta o número de funções no código
+- `methods`            → Analisa os métodos públicos e privados no código
+- `indent`             → Analisa os níveis de indentação
+- `dependencies`       → Analisa as dependências externas do código
+- `comment-ratio`      → Calcula o percentual de comentários por unidade de código
 
-
-## 💡 Exemplo
-```bash
-analyzer all examples/sample.py
-
-analyzer all-dir examples/
-```
+## 🔍 Opções de formato
+Os comandos `all` e `all-dir` aceitam as seguintes opções:
+- `--format` ou `-f`   → Formato de saída (cli ou json)
+- `--output` ou `-o`   → Arquivo de saída para formato json
 
 ## 🧪 Comandos auxiliares (via terminal)
-- `runtests`              → Roda todos os testes
-- `runtests-verbose`      → Roda testes com saída detalhada
-- `runtests-failures`     → Roda somente os testes que falharam anteriormente
+- `runtests`           → Roda todos os testes automatizados
+- `runtests-verbose`   → Roda testes com saída detalhada
+- `runtests-failures`  → Roda somente os testes que falharam anteriormente
 
-
-## 💡 Exemplo
+## 💡 Exemplos
 ```bash
-runtests
-```
+# Análise completa de um arquivo
+analyzer all examples/sample.py
 
+# Análise completa com saída JSON
+analyzer all examples/sample.py --format json
+
+# Análise completa de um diretório
+analyzer all-dir examples/
+
+# Análise de diretório com saída JSON
+analyzer all-dir examples/ --format json
+
+# Salvar resultado em arquivo JSON
+analyzer all examples/sample.py --format json --output resultado.json
+analyzer all-dir examples/ --format json --output resultado.json
+```
     """
         console.print(Markdown(help_text))
         raise typer.Exit()
@@ -86,99 +100,281 @@ runtests
         raise typer.Exit(code=1)
 
 
-@app.command("all-dir", help="Executa 'analyzer all' para todos os arquivos .py no diretório informado.")
-def analyze_directory(
-    path: str = typer.Argument(..., help="Diretório que contém arquivos .py para análise.")
+@app.command("all-dir", help="Analisa todas as métricas dos arquivos Python em um diretório.")
+def analyze_all_dir(
+    directory: str = typer.Argument(..., help="Caminho para o diretório com arquivos Python."),
+    format: str = typer.Option("cli", "--format", "-f", help="Formato de saída (cli ou json)"),
+    output: str = typer.Option(None, "--output", "-o", help="Arquivo de saída (opcional, apenas para formato json)")
 ):
     """
-    Executa 'analyzer all' para todos os arquivos .py no diretório informado.
+    Analisa todas as métricas dos arquivos Python em um diretório.
+
+    Opções de formato:
+    - cli: Exibe resultado formatado no terminal (padrão)
+    - json: Gera saída em formato JSON
+
+    Exemplos:
+        analyzer all-dir examples/
+        analyzer all-dir examples/ --format json
+        analyzer all-dir examples/ --format json --output resultado.json
     """
-    p = Path(path)
-    if not p.exists() or not p.is_dir():
-        typer.secho(f"Diretório '{path}' não encontrado.", fg=typer.colors.RED)
+    try:
+        # Verifica se o diretório existe
+        if not os.path.isdir(directory):
+            typer.secho(f"❌ Diretório não encontrado: {directory}", fg=typer.colors.RED, err=True)
+            raise typer.Exit(code=1)
+
+        # Lista todos os arquivos .py no diretório
+        python_files = [
+            os.path.join(directory, f) 
+            for f in os.listdir(directory) 
+            if f.endswith('.py')
+        ]
+
+        if not python_files:
+            typer.secho(f"⚠️ Nenhum arquivo Python encontrado em: {directory}", fg=typer.colors.YELLOW)
+            raise typer.Exit(code=1)
+
+        # Coleta métricas de todos os arquivos
+        all_metrics = {
+            "directory_analyzed": directory,
+            "analysis_timestamp": datetime.now().isoformat(),
+            "files": {}
+        }
+
+        total_metrics = {
+            "total_files": len(python_files),
+            "total_lines": 0,
+            "total_comments": 0,
+            "total_docstrings": 0,
+            "total_classes": 0,
+            "total_functions": 0,
+            "total_methods": {
+                "public": 0,
+                "private": 0,
+                "total": 0
+            }
+        }
+
+        # Analisa cada arquivo
+        for file_path in python_files:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    code = f.read()
+
+                file_metrics = {
+                    "metrics": {
+                        "lines": count_lines(code),
+                        "comments": count_comments(code),
+                        "docstrings": count_docstrings(code),
+                        "classes": count_classes(code),
+                        "functions": count_functions(code)
+                    },
+                    "methods": {
+                        "public": 0,
+                        "private": 0,
+                        "total": 0,
+                        "ratio": {}
+                    }
+                }
+
+                # Análise de métodos
+                public_methods, private_methods = count_methods(code)
+                total_methods = public_methods + private_methods
+                
+                file_metrics["methods"].update({
+                    "public": public_methods,
+                    "private": private_methods,
+                    "total": total_methods
+                })
+
+                if total_methods > 0:
+                    file_metrics["methods"]["ratio"] = {
+                        "public": round((public_methods / total_methods) * 100, 1),
+                        "private": round((private_methods / total_methods) * 100, 1)
+                    }
+
+                # Atualiza totais
+                total_metrics["total_lines"] += file_metrics["metrics"]["lines"]
+                total_metrics["total_comments"] += file_metrics["metrics"]["comments"]
+                total_metrics["total_docstrings"] += file_metrics["metrics"]["docstrings"]
+                total_metrics["total_classes"] += file_metrics["metrics"]["classes"]
+                total_metrics["total_functions"] += file_metrics["metrics"]["functions"]
+                total_metrics["total_methods"]["public"] += public_methods
+                total_metrics["total_methods"]["private"] += private_methods
+                total_metrics["total_methods"]["total"] += total_methods
+
+                # Adiciona métricas do arquivo ao resultado
+                all_metrics["files"][os.path.basename(file_path)] = file_metrics
+
+            except Exception as e:
+                typer.secho(f"⚠️ Erro ao analisar {file_path}: {str(e)}", fg=typer.colors.YELLOW)
+                continue
+
+        # Adiciona totais ao resultado
+        all_metrics["summary"] = total_metrics
+
+        # Calcula proporção total de métodos
+        if total_metrics["total_methods"]["total"] > 0:
+            all_metrics["summary"]["methods_ratio"] = {
+                "public": round((total_metrics["total_methods"]["public"] / total_metrics["total_methods"]["total"]) * 100, 1),
+                "private": round((total_metrics["total_methods"]["private"] / total_metrics["total_methods"]["total"]) * 100, 1)
+            }
+
+        # Formatação e saída
+        if format.lower() == "json":
+            result = format_output(all_metrics, "json", output)
+            typer.echo(result)
+            return
+
+        # Exibição CLI padrão
+        console.print("\n📊 Análise do Diretório:", directory)
+        
+        # Tabela de resumo
+        summary_table = Table(title="📈 Resumo Geral", title_style="bold cyan")
+        summary_table.add_column("Métrica", style="bold yellow")
+        summary_table.add_column("Valor", justify="right", style="bold green")
+
+        summary_table.add_row("Total de Arquivos", str(total_metrics["total_files"]))
+        summary_table.add_row("Total de Linhas", str(total_metrics["total_lines"]))
+        summary_table.add_row("Total de Comentários", str(total_metrics["total_comments"]))
+        summary_table.add_row("Total de Docstrings", str(total_metrics["total_docstrings"]))
+        summary_table.add_row("Total de Classes", str(total_metrics["total_classes"]))
+        summary_table.add_row("Total de Funções", str(total_metrics["total_functions"]))
+        summary_table.add_row("Total de Métodos Públicos", str(total_metrics["total_methods"]["public"]))
+        summary_table.add_row("Total de Métodos Privados", str(total_metrics["total_methods"]["private"]))
+        summary_table.add_row("Total de Métodos", str(total_metrics["total_methods"]["total"]))
+
+        if "methods_ratio" in all_metrics["summary"]:
+            summary_table.add_row(
+                "Proporção Total Público/Privado",
+                f"{all_metrics['summary']['methods_ratio']['public']}% / {all_metrics['summary']['methods_ratio']['private']}%"
+            )
+
+        console.print(summary_table)
+
+        # Tabela detalhada por arquivo
+        details_table = Table(title="\n📁 Detalhes por Arquivo", title_style="bold cyan")
+        details_table.add_column("Arquivo", style="bold yellow")
+        details_table.add_column("Linhas", justify="right")
+        details_table.add_column("Comentários", justify="right")
+        details_table.add_column("Classes", justify="right")
+        details_table.add_column("Funções", justify="right")
+        details_table.add_column("Métodos (Pub/Priv)", justify="right")
+
+        for filename, metrics in all_metrics["files"].items():
+            details_table.add_row(
+                filename,
+                str(metrics["metrics"]["lines"]),
+                str(metrics["metrics"]["comments"]),
+                str(metrics["metrics"]["classes"]),
+                str(metrics["metrics"]["functions"]),
+                f"{metrics['methods']['public']}/{metrics['methods']['private']}"
+            )
+
+        console.print(details_table)
+
+    except Exception as e:
+        typer.secho(f"❌ Erro durante a análise: {str(e)}", fg=typer.colors.RED, err=True)
         raise typer.Exit(code=1)
 
-    py_files = list(p.glob("*.py"))
-    if not py_files:
-        typer.secho(f"Nenhum arquivo .py encontrado no diretório: {path}", fg=typer.colors.YELLOW)
-        raise typer.Exit()
 
-    for py_file in py_files:
-        typer.echo(f"\n🔍 Analisando {py_file}...")
-        subprocess.run(["analyzer", "all", str(py_file)])
+@app.command("all")
+def analyze_all(
+    file: str = typer.Argument(..., help="Caminho para o arquivo Python a ser analisado."),
+    format: str = typer.Option("cli", "--format", "-f", help="Formato de saída (cli ou json)"),
+    output: str = typer.Option(None, "--output", "-o", help="Arquivo de saída (opcional, apenas para formato json)")
+):
+    """
+    Analisa todas as métricas de um arquivo Python.
 
+    Opções de formato:
+    - cli: Exibe resultado formatado no terminal (padrão)
+    - json: Gera saída em formato JSON
 
-
-@app.command("all", help="Analisa todas as métricas do código (linhas, comentários, docstrings, classes, funções, métodos e dependências externas).")
-def analyze_all(file: str = typer.Argument(..., help="Caminho para o arquivo Python a ser analisado.")):
+    Exemplos:
+        analyzer all arquivo.py
+        analyzer all arquivo.py --format json
+        analyzer all arquivo.py --format json --output resultado.json
+    """
     try:
         with open(file, "r", encoding="utf-8") as f:
             code = f.read()
     except FileNotFoundError:
-        typer.secho(f"Arquivo não encontrado: {file}", fg=typer.colors.RED, err=True)
+        typer.secho(f"❌ Arquivo não encontrado: {file}", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1)
+    except Exception as e:
+        typer.secho(f"❌ Erro ao ler o arquivo: {str(e)}", fg=typer.colors.RED, err=True)
         raise typer.Exit(code=1)
 
-    # Métricas de código
-    line_count = count_lines(code)
-    comment_count = count_comments(code)
-    docstring_count = count_docstrings(code)
-    class_count = count_classes(code)
-    function_count = count_functions(code)
-    indent_result = count_indentation(file)
-    public_methods, private_methods = count_methods(code)
-    total_methods = public_methods + private_methods
+    try:
+        # Coleta todas as métricas
+        metrics = {
+            "file_analyzed": file,
+            "analysis_timestamp": datetime.now().isoformat(),
+            "metrics": {
+                "lines": count_lines(code),
+                "comments": count_comments(code),
+                "docstrings": count_docstrings(code),
+                "classes": count_classes(code),
+                "functions": count_functions(code)
+            },
+            "methods": {
+                "public": 0,
+                "private": 0,
+                "total": 0,
+                "ratio": {}
+            }
+        }
 
-    # Dependências externas com contagem
-    from collections import defaultdict
-    import_counter = defaultdict(int)
-    get_external_imports(file, import_counter)
+        # Análise de métodos
+        public_methods, private_methods = count_methods(code)
+        total_methods = public_methods + private_methods
+        
+        metrics["methods"].update({
+            "public": public_methods,
+            "private": private_methods,
+            "total": total_methods
+        })
 
-    # Proporção comentário/código
-    proporcao = ProporcaoComentarioCodigo(file)
-    resultado_unidades = proporcao.analisar()
-    if resultado_unidades:
-        percentual_medio = round(
-            sum(unidade["percentual"] for unidade in resultado_unidades) / len(resultado_unidades),
-            2
-        )
-    else:
-        percentual_medio = 0.0
+        if total_methods > 0:
+            metrics["methods"]["ratio"] = {
+                "public": round((public_methods / total_methods) * 100, 1),
+                "private": round((private_methods / total_methods) * 100, 1)
+            }
 
-    # Exibição final
-    table = Table(title=f"📊 Análise do Arquivo: {file}", title_style="bold cyan")
-    table.add_column("Métrica", style="bold yellow")
-    table.add_column("Valor", justify="right", style="bold green")
+        # Formatação e saída
+        if format.lower() == "json":
+            result = format_output(metrics, "json", output)
+            typer.echo(result)
+            return
 
-    table.add_row("Total de Linhas", str(line_count))
-    table.add_row("Comentários", str(comment_count))
-    table.add_row("Docstrings", str(docstring_count))
-    table.add_row("Classes", str(class_count))
-    table.add_row("Funções", str(function_count))
-    table.add_row("Métodos Públicos", str(public_methods))
-    table.add_row("Métodos Privados", str(private_methods))
-    table.add_row("Total de Métodos", str(total_methods))
-    if total_methods > 0:
-        public_ratio = (public_methods / total_methods) * 100
-        private_ratio = (private_methods / total_methods) * 100
-        table.add_row("Proporção Público/Privado", f"{public_ratio:.1f}% / {private_ratio:.1f}%")
-    table.add_row("Indentação Média", str(indent_result["average_indent"]))
-    table.add_row("Indentação Máxima", str(indent_result["max_indent"]))
-    table.add_row("Indentação Mínima", str(indent_result["min_indent"]))
-    table.add_row("Dependências Externas", str(len(import_counter)))
-    table.add_row("Comentado (%) Médio por Unidade", f"{percentual_medio}%")
+        # Exibição CLI padrão
+        table = Table(title=f"📊 Análise do Arquivo: {file}", title_style="bold cyan")
+        table.add_column("Métrica", style="bold yellow")
+        table.add_column("Valor", justify="right", style="bold green")
 
-    console.print(table)
+        # Adiciona as linhas na tabela
+        table.add_row("Total de Linhas", str(metrics["metrics"]["lines"]))
+        table.add_row("Comentários", str(metrics["metrics"]["comments"]))
+        table.add_row("Docstrings", str(metrics["metrics"]["docstrings"]))
+        table.add_row("Classes", str(metrics["metrics"]["classes"]))
+        table.add_row("Funções", str(metrics["metrics"]["functions"]))
+        table.add_row("Métodos Públicos", str(metrics["methods"]["public"]))
+        table.add_row("Métodos Privados", str(metrics["methods"]["private"]))
+        table.add_row("Total de Métodos", str(metrics["methods"]["total"]))
+        
+        if total_methods > 0:
+            table.add_row(
+                "Proporção Público/Privado",
+                f"{metrics['methods']['ratio']['public']}% / {metrics['methods']['ratio']['private']}%"
+            )
 
-    if import_counter:
-        dep_table = Table(title="📦 Dependências Externas Detalhadas", title_style="bold magenta")
-        dep_table.add_column("Pacote", style="bold yellow")
-        dep_table.add_column("Ocorrências", justify="right", style="bold green")
+        console.print(table)
 
-        for lib, count in sorted(import_counter.items(), key=lambda x: (-x[1], x[0])):
-            dep_table.add_row(lib, str(count))
-        console.print(dep_table)
-    else:
-        console.print("[green]Nenhuma dependência externa encontrada.[/]")
+    except Exception as e:
+        typer.secho(f"❌ Erro durante a análise: {str(e)}", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1)
 
 
 # Comandos individuais

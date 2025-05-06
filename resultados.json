@@ -1,0 +1,23 @@
+{
+    "timestamp": "2025-05-05T20:58:33.999586",
+    "metrics": {
+        "file_analyzed": "examples/simpletest.py",
+        "analysis_timestamp": "2025-05-05T20:58:33.999332",
+        "metrics": {
+            "lines": 22,
+            "comments": 3,
+            "docstrings": 4,
+            "classes": 1,
+            "functions": 2
+        },
+        "methods": {
+            "public": 1,
+            "private": 0,
+            "total": 1,
+            "ratio": {
+                "public": 100.0,
+                "private": 0.0
+            }
+        }
+    }
+}

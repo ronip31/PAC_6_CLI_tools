@@ -7,7 +7,7 @@ Alunos:
 
 # Sistema Automatizado de Análise de Código
 
-Este projeto oferece uma ferramenta automatizada para análise de código-fonte, facilitando a contagem de linhas, identificação de funções, classes e métodos, além da contabilização de comentários. Desenvolvido especialmente para auxiliar desenvolvedores a melhorar a qualidade e a manutenção de projetos de software.
+Este projeto oferece uma ferramenta automatizada para análise de código-fonte, facilitando a contagem de linhas, identificação de funções, classes e métodos (públicos/privados), além da contabilização de comentários. Desenvolvido especialmente para auxiliar desenvolvedores a melhorar a qualidade e a manutenção de projetos de software.
 
 ## História do Usuário
 
@@ -20,6 +20,7 @@ Como desenvolvedor de sistemas, desejo um sistema de análise automatizada de c�
 - Comando padrão para exibição das opções de ajuda (--help).
 - Validação clara e precisa dos argumentos e parâmetros fornecidos pelo usuário.
 - Menu de ajuda com informações claras sobre cada comando disponível.
+- Suporte a diferentes formatos de saída (CLI e JSON).
 
 ### 2. Contagem de Linhas de Código (LOC)
 - Contagem precisa das linhas de código em um arquivo fornecido pelo usuário.
@@ -28,7 +29,9 @@ Como desenvolvedor de sistemas, desejo um sistema de análise automatizada de c�
 
 ### 3. Identificação e Contagem de Funções, Classes e Métodos
 - Identificação e contagem correta de funções (`def`), classes (`class`) e métodos usando expressões regulares em Python.
-- Retorno separado da contagem de funções, classes e métodos (públicos/privados).
+- Distinção entre métodos públicos e privados.
+- Cálculo da proporção entre métodos públicos e privados.
+- Retorno separado da contagem de funções, classes e métodos.
 - Mensagens amigáveis para padrões inesperados ou arquivos ilegíveis.
 
 ### 4. Contagem de Comentários
@@ -37,10 +40,11 @@ Como desenvolvedor de sistemas, desejo um sistema de análise automatizada de c�
 - Retorno claro do número específico de linhas comentadas.
 
 ### 5. Geração Automática de Relatórios
-- Escolha de formato do relatório (CSV, JSON ou TXT) via argumento CLI.
-- Consolidação clara dos resultados das análises (LOC, funções/classes/métodos e comentários).
+- Escolha de formato do relatório (CLI ou JSON) via argumento.
+- Consolidação clara dos resultados das análises.
+- Suporte a análise de arquivos individuais ou diretórios completos.
 - Relatório objetivo e fácil de interpretar.
-- Informações claras sobre erros durante a geração do relatório (permissões, diretórios inválidos, espaço em disco insuficiente).
+- Informações claras sobre erros durante a geração do relatório.
 
 ### 6. Documentação
 - README claro com explicação dos comandos disponíveis, uso e exemplos práticos.
@@ -61,6 +65,9 @@ O **Code Analyzer CLI** é uma ferramenta de linha de comando desenvolvida em Py
 - Contagem de classes
 - Contagem de funções
 - Análise de métodos (públicos/privados)
+- Análise de indentação
+- Análise de dependências
+- Proporção de comentários por unidade de código
 
 ---
 
@@ -133,20 +140,30 @@ Depois da instalação, você poderá usar o comando `analyzer` diretamente no t
 
 ### Comandos Disponíveis
 
-| Comando              | Descrição                                               |
-|----------------------|---------------------------------------------------------|
-| `all-dir`            | Executa 'analyzer all' para todos os arquivos .py no diretório informado.|
-| `all`                | Analisa todas as métricas do código                     |
+| Comando               | Descrição                                               |
+|-----------------------|---------------------------------------------------------|
+| `all`                | Analisa todas as métricas de um arquivo                |
+| `all-dir`            | Analisa todas as métricas de arquivos em um diretório |
 | `lines`              | Conta o número total de linhas no código                |
 | `comments`           | Conta o número de comentários no código                 |
 | `docstrings`         | Conta o número de docstrings no código                  |
 | `classes`            | Conta o número de classes no código                     |
 | `functions`          | Conta o número de funções no código                     |
-| `methods`            | Analisa os métodos públicos e privados no código        |
-| `indent`             | Analisa os níveis de indentação e mostra média, mínima, máxima e histograma |
-| `dependencies`       | Analisa as dependências externas do código.             |
-| `--version` / `-v`   | Exibe a versão da ferramenta                            |
+| `methods`            | Analisa os métodos públicos e privados no código       |
+| `indent`             | Analisa os níveis de indentação                        |
+| `dependencies`       | Analisa as dependências externas do código             |
+| `comment-ratio`      | Calcula o percentual de comentários por unidade        |
+| `--version` / `-v`   | Exibe a versão da ferramenta                           |
 | `--help`             | Exibe o menu de ajuda personalizado                     |
+
+### Opções de Formato
+
+Os comandos `all` e `all-dir` aceitam as seguintes opções:
+
+| Opção                | Descrição                                               |
+|-----------------------|---------------------------------------------------------|
+| `--format` / `-f`    | Formato de saída (cli ou json)                         |
+| `--output` / `-o`    | Arquivo de saída para formato json                     |
 
 ---
 
@@ -155,36 +172,30 @@ Depois da instalação, você poderá usar o comando `analyzer` diretamente no t
 #### Analisar todas as métricas de um arquivo:
 
 ```bash
+# Saída padrão (CLI)
 analyzer all examples/sample.py
+
+# Saída em JSON
+analyzer all examples/sample.py --format json
+
+# Salvar resultado em arquivo JSON
+analyzer all examples/sample.py --format json --output resultado.json
 ```
 
-## Comandos Auxiliares de Testes
-
-Esses comandos são executados diretamente no terminal após a instalação do projeto:
-
-| Comando               | Descrição                                               |
-|-----------------------|---------------------------------------------------------|
-| `runtests`           | Executa todos os testes automatizados                   |
-| `runtests-verbose`   | Executa todos os testes com saída detalhada             |
-| `runtests-failures`  | Executa apenas os testes que falharam anteriormente     |
-
----
-
-### Exemplos de Uso
-
-#### Executa todos os testes com saída detalhada:
+#### Analisar todas as métricas de um diretório:
 
 ```bash
-runtests-verbose
+# Saída padrão (CLI)
+analyzer all-dir examples/
+
+# Saída em JSON
+analyzer all-dir examples/ --format json
+
+# Salvar resultado em arquivo JSON
+analyzer all-dir examples/ --format json --output resultado.json
 ```
 
-#### Analisar somente comentários:
-
-```bash
-analyzer comments examples/sample.py
-```
-
-#### Analisar métodos públicos e privados:
+#### Analisar somente métodos:
 
 ```bash
 analyzer methods examples/sample.py
@@ -196,10 +207,17 @@ analyzer methods examples/sample.py
 analyzer --version
 ```
 
-#### Ver ajuda geral (com comandos formatados):
+#### Ver ajuda geral:
 
 ```bash
 analyzer --help
+```
+
+#### Ver ajuda específica de um comando:
+
+```bash
+analyzer all --help
+analyzer all-dir --help
 ```
 
 ---
