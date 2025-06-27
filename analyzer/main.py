@@ -7,6 +7,7 @@ from analyzer.analyze_classes import analyze_classes, count_classes
 from analyzer.analyze_functions import analyze_functions, count_functions
 from analyzer.analyze_function_size import analyze_function_size, calculate_function_sizes
 from analyzer.analyze_indentation import analyze_indentation, count_indentation
+from analyzer.analyze_duplicate_code import analyze_duplicate_code, find_duplicate_blocks
 from analyzer.dependency_analyzer import get_external_imports, analyze_repository
 
 from analyzer.analyze_comment_ratio import ProporcaoComentarioCodigo
@@ -60,6 +61,7 @@ Ferramenta CLI para análise de código Python.
 - `classes`            → Conta o número de classes no código
 - `functions`          → Conta o número de funções no código
 - `function-size`      → Analisa o tamanho médio das funções no código
+- `duplicate-code`     → Identifica blocos de código duplicados
 - `methods`            → Analisa os métodos públicos e privados no código
 - `indent`             → Analisa os níveis de indentação
 - `dependencies`       → Analisa as dependências externas do código
@@ -459,6 +461,17 @@ def methods(file: str = typer.Argument(..., help="Caminho para o arquivo Python.
 @app.command("function-size", help="Analisa o tamanho médio das funções no código.")
 def function_size(file: str = typer.Argument(..., help="Caminho para o arquivo Python.")):
     analyze_function_size(file)
+
+@app.command("duplicate-code", help="Identifica blocos de código duplicados no arquivo.")
+def duplicate_code(
+    file: str = typer.Argument(..., help="Caminho para o arquivo Python."),
+    block_size: int = typer.Option(None, "--block-size", "-b", help="Tamanho do bloco para análise (padrão: automático)"),
+    auto: bool = typer.Option(True, "--auto", "-a", help="Modo automático: testa múltiplos tamanhos (2-10 linhas)")
+):
+    # Se block_size foi especificado, desabilita o modo automático
+    if block_size is not None:
+        auto = False
+    analyze_duplicate_code(file, block_size, auto)
 
 
 
