@@ -128,6 +128,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Cache de análises de bugs com IA
+.cache/
+
 # Spyder project settings
 .spyderproject
 .spyproject

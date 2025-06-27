@@ -64,22 +64,22 @@ def analyze_duplicate_code(file: str, block_size: int = None, auto: bool = False
     
     if auto or block_size is None:
         # Modo automático: testa múltiplos tamanhos
-        print("🔍 Analisando duplicações em múltiplos tamanhos de bloco...")
-        print("ℹ️  Ignorando comentários e linhas em branco")
+        print("Analisando duplicações em múltiplos tamanhos de bloco...")
+        print("Ignorando comentários e linhas em branco")
         all_duplicates = find_all_duplicates(code, min_size=2, max_size=10)
         
         if not all_duplicates:
             print("Nenhum bloco duplicado encontrado em nenhum tamanho (2-10 linhas).")
             return
         
-        print(f"\n📊 Resultados encontrados:")
+        print(f"\nResultados encontrados:")
         for size, duplicates in all_duplicates.items():
-            print(f"\n🔸 Blocos de {size} linhas ({len(duplicates)} duplicações):")
+            print(f"\nBlocos de {size} linhas ({len(duplicates)} duplicações):")
             for start, end, h in duplicates:
                 print(f"   Linhas {start}-{end} (hash: {h[:8]}...)")
     else:
         # Modo específico: tamanho definido
-        print(f"ℹ️  Ignorando comentários e linhas em branco")
+        print(f"Ignorando comentários e linhas em branco")
         duplicates = find_duplicate_blocks(code, block_size)
         if not duplicates:
             print(f"Nenhum bloco duplicado de {block_size} linhas encontrado.")

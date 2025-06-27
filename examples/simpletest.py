@@ -20,3 +20,9 @@ def funcao():
     return 427
 
 # Outro comentário isolado
+
+def soma(a, b):
+    return a + b
+
+x = soma(2, 3)
+print(x)

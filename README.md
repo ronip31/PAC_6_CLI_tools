@@ -153,6 +153,8 @@ Depois da instalação, você poderá usar o comando `analyzer` diretamente no t
 | `indent`             | Analisa os níveis de indentação                        |
 | `dependencies`       | Analisa as dependências externas do código             |
 | `comment-ratio`      | Calcula o percentual de comentários por unidade        |
+| `duplicate-code`     | Identifica blocos de código duplicados no arquivo      |
+| `function-size`      | Analisa o tamanho médio das funções no código         |
 | `--version` / `-v`   | Exibe a versão da ferramenta                           |
 | `--help`             | Exibe o menu de ajuda personalizado                     |
 
@@ -220,6 +222,22 @@ analyzer all --help
 analyzer all-dir --help
 ```
 
+#### Analisar código duplicado:
+
+```bash
+# Modo automático (tamanhos de bloco de 2 a 10 linhas)
+analyzer duplicate-code examples/sample.py
+
+# Especificando tamanho do bloco (ex: 5 linhas)
+analyzer duplicate-code examples/sample.py --block-size 5
+```
+
+#### Analisar tamanho médio das funções:
+
+```bash
+analyzer function-size examples/sample.py
+```
+
 ---
 
 ## Análise em Lote (vários arquivos)
@@ -271,5 +289,70 @@ python -m pytest --lf
 ## Licença
 
 Este projeto é open-source e está sob a licença MIT.
+
+---
+
+## Análise de Bugs com IA (OpenAI)
+
+A ferramenta oferece um comando para análise automática de bugs, problemas de qualidade e sugestões de melhoria usando modelos de IA da OpenAI (como GPT-3.5-turbo).
+
+### Configuração da API
+
+Para usar a análise de bugs com IA, é necessário configurar uma chave de API da OpenAI. Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
+
+```env
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-3.5-turbo  # (opcional, pode ser: gpt-3.5-turbo, gpt-3.5-turbo-16k, gpt-4, gpt-4-turbo)
+```
+
+- A chave pode ser obtida em https://platform.openai.com/api-keys
+- O modelo é opcional (padrão: gpt-3.5-turbo)
+- Você também pode definir essas variáveis diretamente no ambiente ou passar via parâmetro CLI
+
+### Uso do Cache
+
+Para evitar limites de uso da API, a ferramenta armazena localmente os resultados das análises em um cache. Se o mesmo código for analisado novamente, o resultado será carregado instantaneamente do cache, sem consumir requisições da OpenAI.
+
+- O cache é salvo no diretório `.cache`.
+- Para ignorar o cache, use a opção `--no-cache`.
+- Para limpar o cache, use `--clear-cache`.
+
+### Comando de Análise de Bugs
+
+Você pode rodar a análise de bugs diretamente:
+
+```bash
+python -m analyzer.analyze_bugs_ai <arquivo.py> [opções]
+```
+
+#### Opções principais:
+- `--language <lang>`: Linguagem do código (padrão: python)
+- `--no-cache`: Ignorar cache
+- `--model <model>`: Modelo a usar (padrão: gpt-3.5-turbo)
+- `--api-key <key>`: Chave da API (sobrepõe .env)
+- `--simple`: Saída simplificada
+- `--clear-cache`: Limpa o cache
+- `--list-models`: Lista modelos disponíveis
+
+#### Exemplos:
+
+```bash
+# Análise padrão
+python -m analyzer.analyze_bugs_ai examples/sample.py
+
+# Usando modelo gpt-4
+python -m analyzer.analyze_bugs_ai examples/sample.py --model gpt-4
+
+# Ignorando cache
+python -m analyzer.analyze_bugs_ai examples/sample.py --no-cache
+
+# Limpar cache
+python -m analyzer.analyze_bugs_ai --clear-cache
+```
+
+### Notas sobre Limites da API
+- Se receber erro 429 (Too Many Requests), aguarde alguns minutos e tente novamente.
+- O cache ajuda a evitar requisições repetidas.
+- Contas gratuitas possuem limites baixos de requisições.
 
 ---

@@ -8,6 +8,7 @@ from analyzer.analyze_functions import analyze_functions, count_functions
 from analyzer.analyze_function_size import analyze_function_size, calculate_function_sizes
 from analyzer.analyze_indentation import analyze_indentation, count_indentation
 from analyzer.analyze_duplicate_code import analyze_duplicate_code, find_duplicate_blocks
+from analyzer.analyze_bugs_ai import analyze_bugs_ai, analyze_bugs_ai_simple
 from analyzer.dependency_analyzer import get_external_imports, analyze_repository
 
 from analyzer.analyze_comment_ratio import ProporcaoComentarioCodigo
@@ -66,11 +67,20 @@ Ferramenta CLI para análise de código Python.
 - `indent`             → Analisa os níveis de indentação
 - `dependencies`       → Analisa as dependências externas do código
 - `comment-ratio`      → Calcula o percentual de comentários por unidade de código
+- `bugs-ai`            → Analisa código usando IA para identificar bugs e problemas
+- `bugs-ai-simple`     → Versão simplificada da análise de bugs com IA
 
 ## 🔍 Opções de formato
 Os comandos `all` e `all-dir` aceitam as seguintes opções:
 - `--format` ou `-f`   → Formato de saída (cli ou json)
 - `--output` ou `-o`   → Arquivo de saída para formato json
+
+## 🤖 Comandos de IA
+Os comandos `bugs-ai` e `bugs-ai-simple` requerem uma chave de API da OpenAI:
+- Configure a variável de ambiente `OPENAI_API_KEY`
+- Ou use `--api-key` para passar a chave diretamente
+- Use `--simple` para modo simplificado
+- Use `--language` para especificar a linguagem (padrão: python)
 
 ## 🧪 Comandos auxiliares (via terminal)
 - `runtests`           → Roda todos os testes automatizados
@@ -94,6 +104,11 @@ analyzer all-dir examples/ --format json
 # Salvar resultado em arquivo JSON
 analyzer all examples/sample.py --format json --output resultado.json
 analyzer all-dir examples/ --format json --output resultado.json
+
+# Análise de bugs com IA
+analyzer bugs-ai examples/sample.py
+analyzer bugs-ai examples/sample.py --simple
+analyzer bugs-ai examples/sample.py --api-key sua_chave_aqui
 ```
     """
         console.print(Markdown(help_text))
@@ -473,9 +488,78 @@ def duplicate_code(
         auto = False
     analyze_duplicate_code(file, block_size, auto)
 
-
-
+@app.command("bugs-ai", help="Analisa código usando IA para identificar bugs e problemas.")
+def bugs_ai(
+    file: str = typer.Argument(..., help="Caminho para o arquivo Python."),
+    language: str = typer.Option("python", "--language", "-l", help="Linguagem de programação"),
+    api_key: str = typer.Option(None, "--api-key", "-k", help="Chave da API (ou configure OPENAI_API_KEY)"),
+    simple: bool = typer.Option(False, "--simple", "-s", help="Modo simplificado"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="Ignorar cache e fazer nova requisição"),
+    model: str = typer.Option(None, "--model", "-m", help="Modelo a ser usado (gpt-3.5-turbo, gpt-4, etc.)")
+):
+    """
+    Analisa código usando IA para identificar bugs, problemas de segurança, performance e qualidade.
     
+    Requer uma chave de API da OpenAI. Configure a variável de ambiente OPENAI_API_KEY
+    ou passe via parâmetro --api-key.
+    
+    O sistema usa cache para evitar requisições desnecessárias. Use --no-cache para forçar
+    uma nova análise.
+    
+    Modelos disponíveis: gpt-3.5-turbo (padrão), gpt-3.5-turbo-16k, gpt-4, gpt-4-turbo
+    
+    Exemplos:
+        analyzer bugs-ai examples/sample.py
+        analyzer bugs-ai examples/sample.py --simple
+        analyzer bugs-ai examples/sample.py --api-key sua_chave_aqui
+        analyzer bugs-ai examples/sample.py --no-cache
+        analyzer bugs-ai examples/sample.py --model gpt-4
+    """
+    if simple:
+        analyze_bugs_ai_simple(file, language, api_key, no_cache, model)
+    else:
+        analyze_bugs_ai(file, language, api_key, no_cache, model)
+
+@app.command("bugs-ai-simple", help="Versão simplificada da análise de bugs com IA.")
+def bugs_ai_simple(
+    file: str = typer.Argument(..., help="Caminho para o arquivo Python."),
+    language: str = typer.Option("python", "--language", "-l", help="Linguagem de programação"),
+    api_key: str = typer.Option(None, "--api-key", "-k", help="Chave da API (ou configure OPENAI_API_KEY)"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="Ignorar cache e fazer nova requisição"),
+    model: str = typer.Option(None, "--model", "-m", help="Modelo a ser usado (gpt-3.5-turbo, gpt-4, etc.)")
+):
+    """
+    Versão simplificada da análise de bugs com IA.
+    
+    Exemplos:
+        analyzer bugs-ai-simple examples/sample.py
+        analyzer bugs-ai-simple examples/sample.py --api-key sua_chave_aqui
+        analyzer bugs-ai-simple examples/sample.py --no-cache
+        analyzer bugs-ai-simple examples/sample.py --model gpt-3.5-turbo
+    """
+    analyze_bugs_ai_simple(file, language, api_key, no_cache, model)
+
+@app.command("clear-cache", help="Limpa o cache de análises de bugs com IA.")
+def clear_cache():
+    """
+    Limpa o cache de análises de bugs com IA.
+    
+    O cache é usado para evitar requisições desnecessárias à API da OpenAI.
+    Use este comando se quiser forçar novas análises.
+    """
+    from analyzer.analyze_bugs_ai import clear_cache
+    clear_cache()
+
+@app.command("list-models", help="Lista os modelos disponíveis para análise de bugs com IA.")
+def list_models():
+    """
+    Lista os modelos disponíveis para análise de bugs com IA.
+    
+    Mostra informações sobre custos, capacidades e recomendações para cada modelo.
+    """
+    from analyzer.analyze_bugs_ai import list_models
+    list_models()
+
 # Entrada CLI
 def cli_main():
     app()

@@ -1,3 +1,5 @@
 typer[all]  # Para criar a CLI
 pytest  # Para rodar os testes unitários automatizados
 rich  # Para formatação rica no terminal
+requests  # Para chamadas de API HTTP
+python-dotenv  # Para carregar variáveis de ambiente de arquivos .env
