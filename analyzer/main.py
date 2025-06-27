@@ -5,6 +5,7 @@ from analyzer.analyze_comments import analyze_comments, count_comments
 from analyzer.analyze_docstrings import analyze_docstrings, count_docstrings
 from analyzer.analyze_classes import analyze_classes, count_classes
 from analyzer.analyze_functions import analyze_functions, count_functions
+from analyzer.analyze_function_size import analyze_function_size, calculate_function_sizes
 from analyzer.analyze_indentation import analyze_indentation, count_indentation
 from analyzer.dependency_analyzer import get_external_imports, analyze_repository
 
@@ -58,6 +59,7 @@ Ferramenta CLI para análise de código Python.
 - `docstrings`         → Conta o número de docstrings no código
 - `classes`            → Conta o número de classes no código
 - `functions`          → Conta o número de funções no código
+- `function-size`      → Analisa o tamanho médio das funções no código
 - `methods`            → Analisa os métodos públicos e privados no código
 - `indent`             → Analisa os níveis de indentação
 - `dependencies`       → Analisa as dependências externas do código
@@ -453,6 +455,10 @@ def comment_ratio(file: str = typer.Argument(..., help="Caminho para o arquivo P
 @app.command("methods", help="Analisa os métodos públicos e privados no código.")
 def methods(file: str = typer.Argument(..., help="Caminho para o arquivo Python.")):
     analyze_methods(file)
+
+@app.command("function-size", help="Analisa o tamanho médio das funções no código.")
+def function_size(file: str = typer.Argument(..., help="Caminho para o arquivo Python.")):
+    analyze_function_size(file)
 
 
 
