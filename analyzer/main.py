@@ -8,7 +8,7 @@ from analyzer.analyze_functions import analyze_functions, count_functions
 from analyzer.analyze_function_size import analyze_function_size, calculate_function_sizes
 from analyzer.analyze_indentation import analyze_indentation, count_indentation
 from analyzer.analyze_duplicate_code import analyze_duplicate_code, find_duplicate_blocks
-from analyzer.analyze_bugs_ai import analyze_bugs_ai, analyze_bugs_ai_simple
+##from analyzer.analyze_bugs_ai import analyze_bugs_ai, analyze_bugs_ai_simple
 from analyzer.dependency_analyzer import get_external_imports, analyze_repository
 
 from analyzer.analyze_comment_ratio import ProporcaoComentarioCodigo
@@ -298,23 +298,14 @@ def analyze_all_dir(
         raise typer.Exit(code=1)
 
 
-@app.command("all")
+@app.command("all", help="Analisa todas as métricas do código (linhas, comentários, docstrings, classes, funções, métodos, indentação, dependências externas e proporção de comentários por unidade de código).")
 def analyze_all(
     file: str = typer.Argument(..., help="Caminho para o arquivo Python a ser analisado."),
     format: str = typer.Option("cli", "--format", "-f", help="Formato de saída (cli ou json)"),
     output: str = typer.Option(None, "--output", "-o", help="Arquivo de saída (opcional, apenas para formato json)")
 ):
     """
-    Analisa todas as métricas de um arquivo Python.
-
-    Opções de formato:
-    - cli: Exibe resultado formatado no terminal (padrão)
-    - json: Gera saída em formato JSON
-
-    Exemplos:
-        analyzer all arquivo.py
-        analyzer all arquivo.py --format json
-        analyzer all arquivo.py --format json --output resultado.json
+    Analisa todas as métricas de um arquivo Python, incluindo indentação, dependências externas e proporção de comentários por unidade.
     """
     try:
         with open(file, "r", encoding="utf-8") as f:
@@ -326,74 +317,101 @@ def analyze_all(
         typer.secho(f"❌ Erro ao ler o arquivo: {str(e)}", fg=typer.colors.RED, err=True)
         raise typer.Exit(code=1)
 
-    try:
-        # Coleta todas as métricas
-        metrics = {
+    # Métricas de código
+    line_count = count_lines(code)
+    comment_count = count_comments(code)
+    docstring_count = count_docstrings(code)
+    class_count = count_classes(code)
+    function_count = count_functions(code)
+    indent_result = count_indentation(file)
+    public_methods, private_methods = count_methods(code)
+    total_methods = public_methods + private_methods
+
+    # Dependências externas com contagem
+    from collections import defaultdict
+    import_counter = defaultdict(int)
+    get_external_imports(file, import_counter)
+
+    # Proporção comentário/código
+    proporcao = ProporcaoComentarioCodigo(file)
+    resultados = proporcao.analisar()
+    if resultados:
+        percentual_medio = round(
+            sum(unidade["percentual"] for unidade in resultados) / len(resultados),
+            2
+        )
+    else:
+        percentual_medio = 0.0
+
+    # Formatação e saída JSON
+    if format.lower() == "json":
+        result_dict = {
             "file_analyzed": file,
-            "analysis_timestamp": datetime.now().isoformat(),
             "metrics": {
-                "lines": count_lines(code),
-                "comments": count_comments(code),
-                "docstrings": count_docstrings(code),
-                "classes": count_classes(code),
-                "functions": count_functions(code)
-            },
-            "methods": {
-                "public": 0,
-                "private": 0,
-                "total": 0,
-                "ratio": {}
+                "lines": line_count,
+                "comments": comment_count,
+                "docstrings": docstring_count,
+                "classes": class_count,
+                "functions": function_count,
+                "public_methods": public_methods,
+                "private_methods": private_methods,
+                "total_methods": total_methods,
+                "indentation": indent_result,
+                "external_dependencies": dict(import_counter),
+                "comment_ratio_avg": percentual_medio,
+                "comment_ratio_units": resultados
             }
         }
+        result = format_output(result_dict, "json", output)
+        typer.echo(result)
+        return
 
-        # Análise de métodos
-        public_methods, private_methods = count_methods(code)
-        total_methods = public_methods + private_methods
-        
-        metrics["methods"].update({
-            "public": public_methods,
-            "private": private_methods,
-            "total": total_methods
-        })
+    # Exibição CLI detalhada (tabelas)
+    table = Table(title=f"📊 Análise do Arquivo: {file}", title_style="bold cyan")
+    table.add_column("Métrica", style="bold yellow")
+    table.add_column("Valor", justify="right", style="bold green")
 
-        if total_methods > 0:
-            metrics["methods"]["ratio"] = {
-                "public": round((public_methods / total_methods) * 100, 1),
-                "private": round((private_methods / total_methods) * 100, 1)
-            }
+    table.add_row("Total de Linhas", str(line_count))
+    table.add_row("Comentários", str(comment_count))
+    table.add_row("Docstrings", str(docstring_count))
+    table.add_row("Classes", str(class_count))
+    table.add_row("Funções", str(function_count))
+    table.add_row("Métodos Públicos", str(public_methods))
+    table.add_row("Métodos Privados", str(private_methods))
+    table.add_row("Total de Métodos", str(total_methods))
+    if total_methods > 0:
+        public_ratio = (public_methods / total_methods) * 100
+        private_ratio = (private_methods / total_methods) * 100
+        table.add_row("Proporção Público/Privado", f"{public_ratio:.1f}% / {private_ratio:.1f}%")
+    table.add_row("Indentação Média", str(indent_result.get("average_indent", "-")))
+    table.add_row("Indentação Máxima", str(indent_result.get("max_indent", "-")))
+    table.add_row("Indentação Mínima", str(indent_result.get("min_indent", "-")))
+    table.add_row("Dependências Externas", str(len(import_counter)))
+    table.add_row("Comentado (%) Médio por Unidade", f"{percentual_medio}%")
 
-        # Formatação e saída
-        if format.lower() == "json":
-            result = format_output(metrics, "json", output)
-            typer.echo(result)
-            return
+    console.print(table)
 
-        # Exibição CLI padrão
-        table = Table(title=f"📊 Análise do Arquivo: {file}", title_style="bold cyan")
-        table.add_column("Métrica", style="bold yellow")
-        table.add_column("Valor", justify="right", style="bold green")
+    if import_counter:
+        dep_table = Table(title="📦 Dependências Externas Detalhadas", title_style="bold magenta")
+        dep_table.add_column("Pacote", style="bold yellow")
+        dep_table.add_column("Ocorrências", justify="right", style="bold green")
+        for lib, count in sorted(import_counter.items(), key=lambda x: (-x[1], x[0])):
+            dep_table.add_row(lib, str(count))
+        console.print(dep_table)
+    else:
+        console.print("[green]Nenhuma dependência externa encontrada.[/]")
 
-        # Adiciona as linhas na tabela
-        table.add_row("Total de Linhas", str(metrics["metrics"]["lines"]))
-        table.add_row("Comentários", str(metrics["metrics"]["comments"]))
-        table.add_row("Docstrings", str(metrics["metrics"]["docstrings"]))
-        table.add_row("Classes", str(metrics["metrics"]["classes"]))
-        table.add_row("Funções", str(metrics["metrics"]["functions"]))
-        table.add_row("Métodos Públicos", str(metrics["methods"]["public"]))
-        table.add_row("Métodos Privados", str(metrics["methods"]["private"]))
-        table.add_row("Total de Métodos", str(metrics["methods"]["total"]))
-        
-        if total_methods > 0:
-            table.add_row(
-                "Proporção Público/Privado",
-                f"{metrics['methods']['ratio']['public']}% / {metrics['methods']['ratio']['private']}%"
-            )
-
-        console.print(table)
-
-    except Exception as e:
-        typer.secho(f"❌ Erro durante a análise: {str(e)}", fg=typer.colors.RED, err=True)
-        raise typer.Exit(code=1)
+    if resultados:
+        ratio_table = Table(title="📈 Proporção Comentário/Código por Unidade", title_style="bold blue")
+        ratio_table.add_column("Unidade", style="bold yellow")
+        ratio_table.add_column("Linhas", justify="right")
+        ratio_table.add_column("Comentários", justify="right")
+        ratio_table.add_column("Comentado (%)", justify="right")
+        for r in resultados:
+            ratio_table.add_row(r["nome"], str(r["linhas_totais"]), str(r["comentarios"]), f'{r["percentual"]}%')
+        console.print(ratio_table)
+    else:
+        console.print("[yellow]⚠️ Nenhuma função ou classe encontrada para proporção comentário/código.[/]")
 
 
 # Comandos individuais

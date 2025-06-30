@@ -1,0 +1,61 @@
+{
+    "timestamp": "2025-06-30T18:20:32.778561",
+    "metrics": {
+        "file_analyzed": "examples/sample.py",
+        "metrics": {
+            "lines": 33,
+            "comments": 3,
+            "docstrings": 6,
+            "classes": 3,
+            "functions": 2,
+            "public_methods": 0,
+            "private_methods": 0,
+            "total_methods": 0,
+            "indentation": {
+                "average_indent": 2.0,
+                "max_indent": 4,
+                "min_indent": 0,
+                "indent_distribution": {
+                    "0": 13,
+                    "4": 13
+                }
+            },
+            "external_dependencies": {
+                "typer": 1
+            },
+            "comment_ratio_avg": 0.0,
+            "comment_ratio_units": [
+                {
+                    "nome": "Classe: MinhaClasse",
+                    "linhas_totais": 3,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: minha_funcao",
+                    "linhas_totais": 3,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: minha_funcao",
+                    "linhas_totais": 3,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Classe: MinhaClasse",
+                    "linhas_totais": 3,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Classe: MinhaClasse",
+                    "linhas_totais": 3,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                }
+            ]
+        }
+    }
+}
