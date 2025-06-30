@@ -155,6 +155,8 @@ Depois da instalação, você poderá usar o comando `analyzer` diretamente no t
 | `comment-ratio`      | Calcula o percentual de comentários por unidade        |
 | `duplicate-code`     | Identifica blocos de código duplicados no arquivo      |
 | `function-size`      | Analisa o tamanho médio das funções no código         |
+| `analyze-complexity` | Analisa a complexidade assintótica das funções        |
+| `analyze-dead-code`  | Identifica funções e classes não utilizadas (código morto) |
 | `--version` / `-v`   | Exibe a versão da ferramenta                           |
 | `--help`             | Exibe o menu de ajuda personalizado                     |
 
@@ -354,5 +356,64 @@ python -m analyzer.analyze_bugs_ai --clear-cache
 - Se receber erro 429 (Too Many Requests), aguarde alguns minutos e tente novamente.
 - O cache ajuda a evitar requisições repetidas.
 - Contas gratuitas possuem limites baixos de requisições.
+
+---
+
+# Quality Server (Servidor de Indicadores de Qualidade)
+
+O **Quality Server** é um servidor web leve e eficiente para receber, armazenar e consultar indicadores de qualidade de projetos de software. Ele permite centralizar e visualizar as métricas geradas pelo Analyzer CLI.
+
+## Como rodar o Quality Server
+
+### 1. Instale as dependências
+
+```bash
+cd quality_server
+pip install -r requirements.txt
+```
+
+### 2. Rode o servidor
+
+```bash
+uvicorn app.main:app --reload
+```
+
+> O servidor estará disponível em [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+## Como utilizar
+
+### API RESTful
+- **POST /projects** — Envie projetos e métricas no formato esperado (veja exemplos no `/docs`)
+- **GET /projects** — Consulte todos os projetos e métricas (retorna JSON ou interface web)
+- **GET /projects/{project_id}/history** — Histórico de métricas de um projeto
+- **POST /upload-raw** — Envie o JSON bruto gerado pelo Analyzer CLI
+
+### Interface Web
+- Acesse [http://127.0.0.1:8000/projects](http://127.0.0.1:8000/projects) para visualizar todos os projetos e métricas em uma tabela amigável.
+- Acesse [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) para explorar e testar a API interativamente (Swagger UI).
+
+### Exemplo de envio de métricas via API
+
+```bash
+curl -X POST "http://127.0.0.1:8000/projects" -H "Content-Type: application/json" -d '{
+  "name": "MeuProjeto",
+  "metrics": [
+    {
+      "timestamp": "2024-05-20T12:00:00",
+      "data": {
+        "lines": 100,
+        "comments": 10,
+        "functions": 5
+      }
+    }
+  ]
+}'
+```
+
+Ou envie o JSON bruto gerado pelo Analyzer CLI:
+
+```bash
+curl -X POST "http://127.0.0.1:8000/upload-raw" -H "Content-Type: application/json" -d @resultadooo.json
+```
 
 ---

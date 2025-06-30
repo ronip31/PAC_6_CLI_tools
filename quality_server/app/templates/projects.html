@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Projetos - Qualidade de Código</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Projetos</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Projeto</th>
+                <th>Última Atualização</th>
+                <th>Métricas</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for project in projects %}
+            <tr>
+                <td>{{ project.name }}</td>
+                <td>{{ project.last_update }}</td>
+                <td>
+                    <ul>
+                    {% for metric in project.metrics %}
+                        <li>{{ metric.timestamp }}: {{ metric.data }}</li>
+                    {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html> 

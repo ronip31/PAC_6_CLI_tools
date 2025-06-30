@@ -26,6 +26,8 @@ from rich.markdown import Markdown
 from analyzer.output_formatter import format_output
 import json
 from datetime import datetime
+from analyzer.analyze_complexity import analyze_complexity, analyze_complexity_code
+from analyzer.analyze_dead_code import analyze_dead_code, analyze_dead_code_cli
 
 app = typer.Typer(
     help="Ferramenta CLI para análise de código Python.",
@@ -343,6 +345,12 @@ def analyze_all(
     else:
         percentual_medio = 0.0
 
+    # Análise de complexidade
+    complexity_results = analyze_complexity_code(code)
+
+    # Análise de código morto
+    dead_code_result = analyze_dead_code(code)
+
     # Formatação e saída JSON
     if format.lower() == "json":
         result_dict = {
@@ -359,7 +367,9 @@ def analyze_all(
                 "indentation": indent_result,
                 "external_dependencies": dict(import_counter),
                 "comment_ratio_avg": percentual_medio,
-                "comment_ratio_units": resultados
+                "comment_ratio_units": resultados,
+                "complexity_analysis": complexity_results,
+                "dead_code": dead_code_result
             }
         }
         result = format_output(result_dict, "json", output)
@@ -412,6 +422,30 @@ def analyze_all(
         console.print(ratio_table)
     else:
         console.print("[yellow]⚠️ Nenhuma função ou classe encontrada para proporção comentário/código.[/]")
+
+    # Tabela de complexidade
+    if complexity_results:
+        complexity_table = Table(title="📈 Complexidade Assintótica das Funções", title_style="bold blue")
+        complexity_table.add_column("Função", style="bold yellow")
+        complexity_table.add_column("Complexidade Estimada", style="bold green")
+        for r in complexity_results:
+            complexity_table.add_row(r["function"], r["complexity"])
+        console.print(complexity_table)
+    else:
+        console.print("[yellow]⚠️ Nenhuma função encontrada para análise de complexidade.[/]")
+
+    # Tabela de código morto
+    if dead_code_result["dead_functions"] or dead_code_result["dead_classes"]:
+        dead_table = Table(title="🪦 Código Morto (Não Utilizado)", title_style="bold red")
+        dead_table.add_column("Tipo", style="bold yellow")
+        dead_table.add_column("Nome", style="bold white")
+        for func in dead_code_result["dead_functions"]:
+            dead_table.add_row("Função", func)
+        for cls in dead_code_result["dead_classes"]:
+            dead_table.add_row("Classe", cls)
+        console.print(dead_table)
+    else:
+        console.print("[green]Nenhuma função ou classe morta encontrada.[/]")
 
 
 # Comandos individuais
@@ -577,6 +611,14 @@ def list_models():
     """
     from analyzer.analyze_bugs_ai import list_models
     list_models()
+
+@app.command("analyze-complexity", help="Analisa a complexidade assintótica das funções do código.")
+def analyze_complexity_cli(file: str = typer.Argument(..., help="Caminho para o arquivo Python.")):
+    analyze_complexity(file)
+
+@app.command("analyze-dead-code", help="Identifica funções e classes não utilizadas (código morto) no arquivo.")
+def analyze_dead_code_command(file: str = typer.Argument(..., help="Caminho para o arquivo Python.")):
+    analyze_dead_code_cli(file)
 
 # Entrada CLI
 def cli_main():

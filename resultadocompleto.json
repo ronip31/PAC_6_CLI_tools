@@ -1,0 +1,196 @@
+{
+    "timestamp": "2025-06-30T19:33:04.656453",
+    "metrics": {
+        "file_analyzed": "examples/sample_full.py",
+        "metrics": {
+            "lines": 83,
+            "comments": 12,
+            "docstrings": 7,
+            "classes": 2,
+            "functions": 13,
+            "public_methods": 4,
+            "private_methods": 2,
+            "total_methods": 6,
+            "indentation": {
+                "average_indent": 3.28,
+                "max_indent": 8,
+                "min_indent": 0,
+                "indent_distribution": {
+                    "0": 26,
+                    "4": 27,
+                    "8": 14
+                }
+            },
+            "external_dependencies": {
+                "typer": 1,
+                "requests": 1,
+                "numpy": 1,
+                "pandas": 1,
+                "rich": 1
+            },
+            "comment_ratio_avg": 2.96,
+            "comment_ratio_units": [
+                {
+                    "nome": "Função: soma",
+                    "linhas_totais": 3,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: produto",
+                    "linhas_totais": 6,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: produto_duplicado",
+                    "linhas_totais": 5,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Classe: Calculadora",
+                    "linhas_totais": 13,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Classe: CalculadoraDuplicada",
+                    "linhas_totais": 8,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: fatorial",
+                    "linhas_totais": 5,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: exemplo_comentado",
+                    "linhas_totais": 9,
+                    "comentarios": 4,
+                    "percentual": 44.44
+                },
+                {
+                    "nome": "Função: __init__",
+                    "linhas_totais": 2,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: somar",
+                    "linhas_totais": 3,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: _armazenar",
+                    "linhas_totais": 2,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: memoria",
+                    "linhas_totais": 2,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: __init__",
+                    "linhas_totais": 2,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: somar",
+                    "linhas_totais": 2,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: _armazenar",
+                    "linhas_totais": 2,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "nome": "Função: memoria",
+                    "linhas_totais": 2,
+                    "comentarios": 0,
+                    "percentual": 0.0
+                }
+            ],
+            "complexity_analysis": [
+                {
+                    "function": "soma",
+                    "complexity": "O(1)"
+                },
+                {
+                    "function": "produto",
+                    "complexity": "O(n)"
+                },
+                {
+                    "function": "produto_duplicado",
+                    "complexity": "O(n)"
+                },
+                {
+                    "function": "fatorial",
+                    "complexity": "O(1)"
+                },
+                {
+                    "function": "exemplo_comentado",
+                    "complexity": "O(1)"
+                },
+                {
+                    "function": "__init__",
+                    "complexity": "O(1)"
+                },
+                {
+                    "function": "somar",
+                    "complexity": "O(1)"
+                },
+                {
+                    "function": "_armazenar",
+                    "complexity": "O(1)"
+                },
+                {
+                    "function": "memoria",
+                    "complexity": "O(1)"
+                },
+                {
+                    "function": "__init__",
+                    "complexity": "O(1)"
+                },
+                {
+                    "function": "somar",
+                    "complexity": "O(1)"
+                },
+                {
+                    "function": "_armazenar",
+                    "complexity": "O(1)"
+                },
+                {
+                    "function": "memoria",
+                    "complexity": "O(1)"
+                }
+            ],
+            "dead_code": {
+                "dead_functions": [
+                    "__init__",
+                    "_armazenar",
+                    "exemplo_comentado",
+                    "memoria",
+                    "produto",
+                    "produto_duplicado",
+                    "soma",
+                    "somar"
+                ],
+                "dead_classes": [
+                    "Calculadora",
+                    "CalculadoraDuplicada"
+                ]
+            }
+        }
+    }
+}
