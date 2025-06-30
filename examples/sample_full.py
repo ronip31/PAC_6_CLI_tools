@@ -26,6 +26,12 @@ def produto(lista):
     for x in lista:
         resultado *= x
     return resultado
+def potencia(x,y):
+    resultado = 1
+    for i in range(y):
+        for j in range(x):
+            resultado *= x
+    return resultado
 
 # Função duplicada propositalmente
 
